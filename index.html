@@ -28,8 +28,30 @@
         </ul>
       </header>
       <section>
-        <h3>Example</h3>
+        <h3>Here are some examples:</h3>
         <div class='nodemap' data-title='Font Property'>
+          <span>font:</span>
+          <div data-title='Optional'>
+              <div data-title='Style'>
+                  <span>&nbsp;italic&nbsp;</span>
+              </div>
+              <div data-title='variant'>
+                  <span>small-caps</span>
+              </div>
+              <div data-title='Weight'>
+                  <span>&nbsp;bolder&nbsp;</span>
+              </div>
+          </div>
+          <div data-title='Size'>
+              <span>&nbsp;18px / 15px&nbsp;</span>
+          </div>
+          <div data-title='Family'>
+              <span>Helvetica</span>
+          </div>
+      </div>
+      <br>
+        <div class='nodemap'>
+          <span>font:</span>
           <div data-title='Optional'>
               <div data-title='Style'>
                   <span>&nbsp;italic&nbsp;</span>
@@ -49,25 +71,23 @@
           </div>
       </div>
       <br><br>
-      <h3>And with no parent node:<h3>
-        <div class='nodemap'>
-          <div data-title='Optional'>
-              <div data-title='Style'>
-                  <span>&nbsp;italic&nbsp;</span>
-              </div>
-              <div data-title='variant'>
-                  <span>small-caps</span>
-              </div>
-              <div data-title='Weight'>
-                  <span>&nbsp;bolder&nbsp;</span>
-              </div>
+      <h3>The quick brown fox jumps over the lazy dog</h3>
+      <div class='nodemap'>
+        <div data-title='Main Clause'>
+          <div data-title='Subject'>
+            <span>The</span>
+            <span>quick</span>
+            <span data-color='brown'>brown</span>
+            <span>fox</span>
           </div>
-          <div data-title='Size'>
-              <span>&nbsp;18px / 15px&nbsp;</span>
+          <div data-title='Verb'>
+            <span>jumps</span>
           </div>
-          <div data-title='Family'>
-              <span>Helvetica</span>
-          </div>
+        </div>
+        <div data-title='Adverb'><span>&nbsp;over&nbsp;</span></div>
+        <span>the</span>
+        <div data-title='Adj'><span>lazy</span></div>
+        <div data-title='Noun'><span>dog</span></div>
       </div>
       <script>
         $('.nodemap').treer();
