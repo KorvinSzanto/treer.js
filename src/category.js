@@ -42,7 +42,8 @@ Category.prototype = {
     return this.get('parent');
   },
   getMultiplier: function() {
-    return window.devicePixelRatio;
+    var pr = window.devicePixelRatio;
+    return pr ? pr : 1;
   },
   getTitle: function() {
     this.getWidth(1);
@@ -161,21 +162,21 @@ Category.prototype = {
         height  = (this.getTitle() ? 17 : 0) + 17 * this.getDepth(),
         scale   = this.getMultiplier();
 
-    canvas.style.width = width;
-    canvas.style.height = height;
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
     canvas.width = width * scale;
     canvas.height = height * scale;
-    context.scale(2, 2);
+    context.scale(scale, scale);
 
-    this.renderInContext(context, 0);
+    this.renderInContext(context, height, 0);
     if (element && element.parentNode) {
       element.parentNode.replaceChild(canvas, element);
     }
     return canvas;
   },
-  renderInContext: function(ctx, offset) {
+  renderInContext: function(ctx, height, offset) {
     var m = this.getMultiplier(),
-        bottom = parseInt(ctx.canvas.style.height) - 6.5,
+        bottom = height - 6.5,
         top = Math.round(bottom - (17 * this.getDepth())) - 0.5,
         start = offset + 0.5,
         stop = Math.round(offset + this.getWidth()) - 5.5,
@@ -209,7 +210,7 @@ Category.prototype = {
       if (child instanceof Category && lastNode === 'node') {
         offset += 10;
       }
-      child.renderInContext(ctx, offset);
+      child.renderInContext(ctx, height, offset);
       offset += child.getWidth();
       lastNode = child instanceof Node ? 'node' : 'category';
     });
