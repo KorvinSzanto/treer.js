@@ -53,7 +53,7 @@ Node.prototype = {
                                'Helvetica, Arial, ' +
                                '"Lucida Grande", sans-serif';
     element.style.fontSize = '16px';
-    element.innerText = this.getTitle();
+    element.innerText = element.textContent = this.getTitle();
     document.body.appendChild(element);
     width += element.offsetWidth;
     document.body.removeChild(element);

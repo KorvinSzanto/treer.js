@@ -117,7 +117,7 @@ Category.prototype = {
                                '"Lucida Grande", sans-serif';
     element.style.fontWeight = 'normal';
     element.style.fontSize = '12px';
-    element.innerText = this.getTitle();
+    element.innerText = element.textContent = this.getTitle();
     document.body.appendChild(element);
     title_width += element.offsetWidth;
     document.body.removeChild(element);
@@ -125,7 +125,7 @@ Category.prototype = {
     return title_width;
   },
   getFromElement: function(element) {
-    var nodes, i, node, child, width = 0;
+    var nodes, i, node, child, width = 0, text;
     this.set('element',element);
     this.setTitle(element.getAttribute('data-title'));
     this.setColor(element.getAttribute('data-color'));
@@ -140,7 +140,8 @@ Category.prototype = {
           this.setDepth(child.getDepth() + 1);
         }
       } else if (node.nodeName === 'SPAN') {
-        child = Node(node.innerText);
+        text = node.innertext;
+        child = Node(text ? text : node.textContent);
         child.setColor(node.getAttribute('data-color'));
       }
       if (child) {
@@ -261,7 +262,7 @@ Node.prototype = {
                                'Helvetica, Arial, ' +
                                '"Lucida Grande", sans-serif';
     element.style.fontSize = '16px';
-    element.innerText = this.getTitle();
+    element.innerText = element.textContent = this.getTitle();
     document.body.appendChild(element);
     width += element.offsetWidth;
     document.body.removeChild(element);
