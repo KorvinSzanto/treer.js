@@ -187,6 +187,7 @@ Category.prototype = {
         actual_title_start = Math.max(title_start, start),
         actual_title_stop = Math.min(title_stop, stop);
 
+    ctx.strokeStyle = '#aaa';
     if (this.getTitle()) {
       ctx.moveTo(start, bottom);
       ctx.lineTo(start, top);
