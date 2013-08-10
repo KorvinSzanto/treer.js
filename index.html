@@ -28,7 +28,28 @@
       </header>
       <section>
         <h3>Example</h3>
-        <div id='nodemap' data-title='Font Property'>
+        <div class='nodemap' data-title='Font Property'>
+          <div data-title='Optional'>
+              <div data-title='Style'>
+                  <span>&nbsp;italic&nbsp;</span>
+              </div>
+              <div data-title='variant'>
+                  <span>small-caps</span>
+              </div>
+              <div data-title='Weight'>
+                  <span>&nbsp;bolder&nbsp;</span>
+              </div>
+          </div>
+          <div data-title='Size'>
+              <span>&nbsp;18px / 15px&nbsp;</span>
+          </div>
+          <div data-title='Family'>
+              <span>Helvetica</span>
+          </div>
+      </div>
+      <br><br>
+      <h3>And with no parent node:<h3>
+        <div class='nodemap'>
           <div data-title='Optional'>
               <div data-title='Style'>
                   <span>&nbsp;italic&nbsp;</span>
@@ -48,7 +69,11 @@
           </div>
       </div>
       <script>
-          document.getElementById('nodemap').treer();
+        var elements = document.getElementsByClassName('nodemap'), i, arr = [];
+        for (var i = 0; i < elements.length; i++) { arr.push(elements[i]) }
+        arr.forEach(function(elem){
+          elem.treer();
+        });
       </script>
 
       </section>
