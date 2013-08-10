@@ -11,6 +11,7 @@
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <script type="text/javascript" src='http://code.jquery.com/jquery-git2.js'></script>
     <script type="text/javascript" src='javascripts/treer.js'></script>
   </head>
   <body>
@@ -69,11 +70,7 @@
           </div>
       </div>
       <script>
-        var elements = document.getElementsByClassName('nodemap'), i, arr = [];
-        for (var i = 0; i < elements.length; i++) { arr.push(elements[i]) }
-        arr.forEach(function(elem){
-          elem.treer();
-        });
+        $('.nodemap').treer();
       </script>
 
       </section>
