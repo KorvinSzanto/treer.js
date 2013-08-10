@@ -41,6 +41,9 @@ Category.prototype = {
   getParent: function() {
     return this.get('parent');
   },
+  getMultiplier: function() {
+    return window.devicePixelRatio;
+  },
   getTitle: function() {
     this.getWidth(1);
     return this.get('title');
@@ -153,9 +156,17 @@ Category.prototype = {
   renderCanvas: function() {
     var canvas  = document.createElement('canvas'),
         context = canvas.getContext('2d'),
-        element = this.get('element');
-    canvas.width = this.getWidth() - 5;
-    canvas.height = (this.getTitle() ? 17 : 0) + 17 * this.getDepth();
+        element = this.get('element'),
+        width   = this.getWidth() - 5,
+        height  = (this.getTitle() ? 17 : 0) + 17 * this.getDepth(),
+        scale   = this.getMultiplier();
+
+    canvas.style.width = width;
+    canvas.style.height = height;
+    canvas.width = width * scale;
+    canvas.height = height * scale;
+    context.scale(2, 2);
+
     this.renderInContext(context, 0);
     if (element && element.parentNode) {
       element.parentNode.replaceChild(canvas, element);
@@ -163,11 +174,12 @@ Category.prototype = {
     return canvas;
   },
   renderInContext: function(ctx, offset) {
-    var bottom = ctx.canvas.height - 6,
-        top = bottom - (17 * this.getDepth()) - 0.5,
+    var m = this.getMultiplier(),
+        bottom = parseInt(ctx.canvas.style.height) - 6.5,
+        top = Math.round(bottom - (17 * this.getDepth())) - 0.5,
         start = offset + 0.5,
-        stop = offset + this.getWidth() - 5.5,
-        title_start = start + ((stop - start) / 2 - (this.getTitleWidth() / 2)),
+        stop = Math.round(offset + this.getWidth()) - 5.5,
+        title_start = (start + ((stop - start) / 2 - (this.getTitleWidth() / 2))),
         title_stop = title_start + this.getTitleWidth(),
         actual_title_start = Math.max(title_start, start),
         actual_title_stop = Math.min(title_stop, stop);

@@ -70,6 +70,6 @@ Node.prototype = {
     ctx.textBaseline = 'bottom';
     ctx.textAlign = 'left';
     ctx.fillStyle = this.getColor();
-    ctx.fillText(this.getTitle(), offset + 8, ctx.canvas.height);
+    ctx.fillText(this.getTitle(), offset + 8, parseInt(ctx.canvas.style.height));
   }
 };
