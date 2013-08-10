@@ -140,7 +140,7 @@ Category.prototype = {
         context = canvas.getContext('2d'),
         element = this.get('element');
     canvas.width = this.getWidth() - 5;
-    canvas.height = 17 + 17 * this.getDepth();
+    canvas.height = (this.getTitle() ? 17 : 0) + 17 * this.getDepth();
     this.renderInContext(context, 0);
     if (element && element.parentNode) {
       element.parentNode.replaceChild(canvas, element);
