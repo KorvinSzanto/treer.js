@@ -139,9 +139,9 @@ Category.prototype = {
     var canvas  = document.createElement('canvas'),
         context = canvas.getContext('2d'),
         element = this.get('element');
-    canvas.width = this.getWidth() + 100;
-    canvas.height = 16 + (16 * this.getDepth());
-    this.renderInContext(context, 10);
+    canvas.width = this.getWidth() - 5;
+    canvas.height = 17 + 17 * this.getDepth();
+    this.renderInContext(context, 0);
     if (element && element.parentNode) {
       element.parentNode.replaceChild(canvas, element);
     }
@@ -261,7 +261,7 @@ Node.prototype = {
   }
 };
 
-  HTMLElement.prototype.treeer = function() {
+  HTMLElement.prototype.treer = function() {
     var cat = Category(this);
     return cat.renderCanvas();
   };

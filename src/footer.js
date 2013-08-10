@@ -1,5 +1,5 @@
 
-  HTMLElement.prototype.treeer = function() {
+  HTMLElement.prototype.treer = function() {
     var cat = Category(this);
     return cat.renderCanvas();
   };
