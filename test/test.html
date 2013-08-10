@@ -1,6 +1,6 @@
 <script src='../treer.js'></script>
-<div id='nodemap'>
-    <span data-color='blue'>font:</span>
+<div id='nodemap' data-title='Font Property' data-type='none'>
+    <span style='color:blue'>font:</span>
     <div data-title='Optional'>
         <div data-title='Style'>
             <span>&nbsp;italic&nbsp;</span>
@@ -11,7 +11,7 @@
         <span>freetext</span>
         <span>freetext</span>
         <div data-title='Weight'>
-            <span>&nbsp;bolder&nbsp;</span>
+            <span style='font-weight:bold'>&nbsp;bolder&nbsp;</span>
         </div>
         <span>freetext</span>
     </div>
@@ -26,5 +26,5 @@
     </div>
 </div>
 <script>
-document.getElementById('nodemap').treer();
+    document.getElementById('nodemap').treer();
 </script>

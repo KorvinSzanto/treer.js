@@ -4,14 +4,22 @@ function Category(config) {
   }
 
   var me = {
-    title:null,
-    width:null,
-    depth:1,
-    children:[],
-    parent:null,
-    element:null,
-    title_width:null,
-    color:'black'
+    title: null,
+    width: null,
+    depth: 1,
+    children: [],
+    parent: null,
+    element: null,
+    title_width: null,
+    color: 'black',
+    font_family: '"HelveticaNeue-Light", ' +
+                 '"Helvetica Neue Light", ' +
+                 '"Helvetica Neue", ' +
+                 'Helvetica, Arial, ' +
+                 '"Lucida Grande", sans-serif',
+    font_weight: 'normal',
+    font_size: 12,
+    category_type: Category.CategoryType.default
   };
 
   this.set = function(k, v) {
@@ -33,6 +41,12 @@ function Category(config) {
   }
   return this.init(config);
 }
+// Enum
+Category.CategoryType = {
+  default: 0,
+  center: 1,
+  none: 2
+};
 
 Category.prototype = {
   init:function(config) {
@@ -58,6 +72,18 @@ Category.prototype = {
   setColor: function(color) {
     if (!color) return this;
     return this.set('color',color);
+  },
+  setFontFamily: function(family) {
+    return this.set('font_family',family);
+  },
+  getFontFamily: function() {
+    return this.get('font_family');
+  },
+  setFontSize: function(size) {
+    return this.set('font_size',size);
+  },
+  getFontSize: function() {
+    return this.get('font_size');
   },
   getDepth: function() {
     return this.get('depth');
@@ -112,13 +138,9 @@ Category.prototype = {
       return this.get('title_width');
     }
     element = document.createElement('span');
-    element.style.fontFamily = '"HelveticaNeue-Light", ' +
-                               '"Helvetica Neue Light", ' +
-                               '"Helvetica Neue", ' +
-                               'Helvetica, Arial, ' +
-                               '"Lucida Grande", sans-serif';
-    element.style.fontWeight = 'normal';
-    element.style.fontSize = '12px';
+    element.style.fontFamily = this.getFontFamily();
+    element.style.fontWeight = this.get('font_weight');
+    element.style.fontSize = this.getFontSize() + 'px';
     element.innerText = element.textContent = this.getTitle();
     document.body.appendChild(element);
     title_width += element.offsetWidth;
@@ -127,10 +149,25 @@ Category.prototype = {
     return title_width;
   },
   getFromElement: function(element) {
-    var nodes, i, node, child, width = 0, text;
+    var nodes, i, node, child, width = 0, text, data_type = element.getAttribute('data-type');
     this.set('element',element);
     this.setTitle(element.getAttribute('data-title'));
     this.setColor(element.getAttribute('data-color'));
+    if (element.style.fontFamily) {
+      this.setFontFamily(element.style.fontFamily);
+    }
+    if (element.style.fontSize) {
+      this.setFontSize(parseInt(element.style.fontSize));
+    }
+    if (element.style.fontWeight) {
+      this.set('font_weight',element.style.fontWeight);
+    }
+
+    if (data_type === 'center') {
+      this.set('category_type', Category.CategoryType.center);
+    } else if (data_type === 'none') {
+      this.set('category_type', Category.CategoryType.none);
+    }
     node = element.firstChild;
 
     while(node) {
@@ -142,9 +179,8 @@ Category.prototype = {
           this.setDepth(child.getDepth() + 1);
         }
       } else if (node.nodeName === 'SPAN') {
-        text = node.innertext;
-        child = Node(text ? text : node.textContent);
-        child.setColor(node.getAttribute('data-color'));
+        child = Node(node);
+        child.setColor(node.style.color);
       }
       if (child) {
         this.addChild(child);
@@ -180,25 +216,35 @@ Category.prototype = {
         top = Math.round(bottom - (17 * this.getDepth())) - 0.5,
         start = offset + 0.5,
         stop = Math.round(offset + this.getWidth()) - 5.5,
-        title_start = (start + ((stop - start) / 2 - (this.getTitleWidth() / 2))),
+        center = start + (stop - start) / 2,
+        title_start = center - (this.getTitleWidth() / 2),
         title_stop = title_start + this.getTitleWidth(),
         actual_title_start = Math.max(title_start, start),
         actual_title_stop = Math.min(title_stop, stop);
 
     ctx.strokeStyle = '#aaa';
     if (this.getTitle()) {
-      ctx.moveTo(start, bottom);
-      ctx.lineTo(start, top);
-      ctx.lineTo(actual_title_start, top);
-      ctx.moveTo(actual_title_stop, top)
-      ctx.lineTo(stop, top);
-      ctx.lineTo(stop, bottom);
+      switch (this.get('category_type')) {
+        case Category.CategoryType.default:
+        default:
+          ctx.moveTo(start, bottom);
+          ctx.lineTo(start, top);
+          ctx.lineTo(actual_title_start, top);
+          ctx.moveTo(actual_title_stop, top);
+          ctx.lineTo(stop, top);
+          ctx.lineTo(stop, bottom);
+          break;
+        case Category.CategoryType.center:
+          if (top + 10 < bottom - 17) {
+            ctx.moveTo(start + (stop - start) / 2, top + 10);
+            ctx.lineTo(start + (stop - start) / 2, bottom - 17);
+          }
+          break;
+        case Category.CategoryType.none:
+          break;
+      }
 
-      ctx.font = '12px "HelveticaNeue-Light", ' +
-                       '"Helvetica Neue Light", ' +
-                       '"Helvetica Neue", ' +
-                       'Helvetica, Arial, ' +
-                       '"Lucida Grande", sans-serif';
+      ctx.font = this.get('font_weight') + ' ' +this.getFontSize() + 'px ' + this.getFontFamily();
       ctx.fillStyle = this.getColor();
       ctx.fontWeight = 'normal';
       ctx.textBaseline = 'middle';
