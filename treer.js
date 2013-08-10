@@ -40,6 +40,9 @@ Category.prototype = {
   init:function(config) {
     this.setTitle(config.title);
   },
+  getParent: function() {
+    return this.get('parent');
+  },
   getTitle: function() {
     this.getWidth(1);
     return this.get('title');
@@ -72,6 +75,10 @@ Category.prototype = {
     }
     return false;
   },
+  isLastChild: function(child) {
+    var children = this.getChildren();
+    return (children[children.length - 1] == child)
+  },
   addChild: function(child) {
     child.set('parent', this);
     return this.addTo('children',child);
@@ -80,11 +87,20 @@ Category.prototype = {
     if (this.get('width') > 0) {
       return this.get('width');
     }
-    var width = 10;
-    this.get('children').forEach(function(node){
+    var width = 10, lastNode, children = this.get('children');
+    children.forEach(function(node){
+      if (node instanceof Category && lastNode === 'node') {
+        width += 10;
+      }
       width += node.getWidth();
+      lastNode = node instanceof Node ? 'node' : 'category';
     });
-    if (this instanceof Category && this.hasCategoryChild()) width -= 10;
+    var hasCategoryChild = this.hasCategoryChild();
+    if (hasCategoryChild && children[children.length - 1] instanceof Category) {
+      width -= 10;
+    } else if (hasCategoryChild) {
+      width += 5;
+    }
     this.set('width', width);
     return width;
   },
@@ -177,9 +193,14 @@ Category.prototype = {
       ctx.fillText(this.getTitle(), title_start + 5, top);
     }
 
+    var lastNode;
     this.getChildren().forEach(function(child){
+      if (child instanceof Category && lastNode === 'node') {
+        offset += 10;
+      }
       child.renderInContext(ctx, offset);
       offset += child.getWidth();
+      lastNode = child instanceof Node ? 'node' : 'category';
     });
 
     ctx.stroke();
