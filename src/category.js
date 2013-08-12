@@ -18,15 +18,33 @@ function Category(config) {
                  'Helvetica, Arial, ' +
                  '"Lucida Grande", sans-serif',
     font_weight: 'normal',
+    bracket_color: '#aaa',
     font_size: 12,
+    scale: window.devicePixelRatio,
     category_type: Category.CategoryType.default
   };
 
-  this.set = function(k, v) {
+  this.set = function(k, v, direct) {
+    if (direct !== true) {
+      var method = 'set' + k.split('_').map(function(val){
+        return val[0].toUpperCase() + val.substr(1)
+      }).join('');
+      if (this[method] && typeof this[method] === 'function') {
+        return this[method](v);
+      }
+    }
     me[k] = v;
     return this;
   }
-  this.get = function(k) {
+  this.get = function(k, direct) {
+    if (direct !== true) {
+      var method = 'get' + k.split('_').map(function(val){
+        return val[0].toUpperCase() + val.substr(1)
+      }).join('');
+      if (this[method] && typeof this[method] === 'function') {
+        return this[method]();
+      }
+    }
     return me[k];
   }
   this.addTo = function(k, v) {
@@ -52,47 +70,9 @@ Category.prototype = {
   init:function(config) {
     this.setTitle(config.title);
   },
-  getParent: function() {
-    return this.get('parent');
-  },
-  getMultiplier: function() {
-    var pr = window.devicePixelRatio;
-    return pr ? pr : 1;
-  },
-  getTitle: function() {
-    this.getWidth(1);
-    return this.get('title');
-  },
-  setTitle: function(title) {
-    return this.set('title',title);
-  },
-  getColor: function() {
-    return this.get('color');
-  },
   setColor: function(color) {
     if (!color) return this;
-    return this.set('color',color);
-  },
-  setFontFamily: function(family) {
-    return this.set('font_family',family);
-  },
-  getFontFamily: function() {
-    return this.get('font_family');
-  },
-  setFontSize: function(size) {
-    return this.set('font_size',size);
-  },
-  getFontSize: function() {
-    return this.get('font_size');
-  },
-  getDepth: function() {
-    return this.get('depth');
-  },
-  setDepth: function(depth) {
-    return this.set('depth',depth);
-  },
-  getChildren: function() {
-    return this.get('children');
+    return this.set('color', color, true);
   },
   hasCategoryChild: function() {
     var children = this.get('children'), i;
@@ -104,7 +84,7 @@ Category.prototype = {
     return false;
   },
   isLastChild: function(child) {
-    var children = this.getChildren();
+    var children = this.get('children');
     return (children[children.length - 1] == child)
   },
   addChild: function(child) {
@@ -112,8 +92,8 @@ Category.prototype = {
     return this.addTo('children',child);
   },
   getWidth: function() {
-    if (this.get('width') > 0) {
-      return this.get('width');
+    if (this.get('width', true) > 0) {
+      return this.get('width', true);
     }
     var width = 10, lastNode, children = this.get('children');
     children.forEach(function(node){
@@ -134,14 +114,14 @@ Category.prototype = {
   },
   getTitleWidth: function(reset) {
     var title_width = 10, element;
-    if (!reset && this.get('title_width') !== null) {
-      return this.get('title_width');
+    if (!reset && this.get('title_width', true) !== null) {
+      return this.get('title_width', true);
     }
     element = document.createElement('span');
-    element.style.fontFamily = this.getFontFamily();
+    element.style.fontFamily = this.get('font_family');
     element.style.fontWeight = this.get('font_weight');
-    element.style.fontSize = this.getFontSize() + 'px';
-    element.innerText = element.textContent = this.getTitle();
+    element.style.fontSize = this.get('font_size') + 'px';
+    element.innerText = element.textContent = this.get('title');
     document.body.appendChild(element);
     title_width += element.offsetWidth;
     document.body.removeChild(element);
@@ -149,18 +129,23 @@ Category.prototype = {
     return title_width;
   },
   getFromElement: function(element) {
-    var nodes, i, node, child, width = 0, text, data_type = element.getAttribute('data-type');
+    var nodes, i, node, child, width = 0, text,
+        data_type = element.getAttribute('data-type'),
+        bracket_color;
     this.set('element',element);
-    this.setTitle(element.getAttribute('data-title'));
+    this.set('title', element.getAttribute('data-title'));
     this.setColor(element.getAttribute('data-color'));
     if (element.style.fontFamily) {
-      this.setFontFamily(element.style.fontFamily);
+      this.set('font_family', element.style.fontFamily);
     }
     if (element.style.fontSize) {
-      this.setFontSize(parseInt(element.style.fontSize));
+      this.set('font_size', parseInt(element.style.fontSize));
     }
     if (element.style.fontWeight) {
-      this.set('font_weight',element.style.fontWeight);
+      this.set('font_weight', element.style.fontWeight);
+    }
+    if (bracket_color = element.getAttribute('data-bracket-color')) {
+      this.set('bracket_color', bracket_color);
     }
 
     if (data_type === 'center') {
@@ -175,8 +160,8 @@ Category.prototype = {
       child = null;
       if (node.nodeName === 'DIV') {
         child = Category(node);
-        if (child.getDepth() >= this.getDepth()) {
-          this.setDepth(child.getDepth() + 1);
+        if (child.get('depth') >= this.get('depth')) {
+          this.set('depth', child.get('depth') + 1);
         }
       } else if (node.nodeName === 'SPAN') {
         child = Node(node);
@@ -195,8 +180,8 @@ Category.prototype = {
         context = canvas.getContext('2d'),
         element = this.get('element'),
         width   = this.getWidth() - 5,
-        height  = (this.getTitle() ? 17 : 0) + 17 * this.getDepth(),
-        scale   = this.getMultiplier();
+        height  = (this.get('title') ? 17 : 0) + 17 * this.get('depth'),
+        scale   = this.get('scale');
 
     canvas.style.width = width + "px";
     canvas.style.height = height + "px";
@@ -211,19 +196,20 @@ Category.prototype = {
     return canvas;
   },
   renderInContext: function(ctx, height, offset) {
-    var m = this.getMultiplier(),
+    var m = this.get('scale'),
         bottom = height - 6.5,
-        top = Math.round(bottom - (17 * this.getDepth())) - 0.5,
+        top = Math.round(bottom - (17 * this.get('depth'))) - 0.5,
         start = offset + 0.5,
-        stop = Math.round(offset + this.getWidth()) - 5.5,
+        stop = Math.round(offset + this.get('width')) - 5.5,
         center = start + (stop - start) / 2,
         title_start = center - (this.getTitleWidth() / 2),
         title_stop = title_start + this.getTitleWidth(),
         actual_title_start = Math.max(title_start, start),
         actual_title_stop = Math.min(title_stop, stop);
 
-    ctx.strokeStyle = '#aaa';
-    if (this.getTitle()) {
+    ctx.strokeStyle = this.get('bracket_color');
+    ctx.beginPath();
+    if (this.get('title')) {
       switch (this.get('category_type')) {
         case Category.CategoryType.default:
         default:
@@ -233,35 +219,41 @@ Category.prototype = {
           ctx.moveTo(actual_title_stop, top);
           ctx.lineTo(stop, top);
           ctx.lineTo(stop, bottom);
+
           break;
         case Category.CategoryType.center:
           if (top + 10 < bottom - 17) {
             ctx.moveTo(start + (stop - start) / 2, top + 10);
             ctx.lineTo(start + (stop - start) / 2, bottom - 17);
           }
+
           break;
         case Category.CategoryType.none:
           break;
       }
+      ctx.stroke();
+      ctx.closePath();
 
-      ctx.font = this.get('font_weight') + ' ' +this.getFontSize() + 'px ' + this.getFontFamily();
-      ctx.fillStyle = this.getColor();
+
+      ctx.font = this.get('font_weight') + ' ' +
+                 this.get('font_size') + 'px ' +
+                 this.get('font_family');
+      ctx.fillStyle = this.get('color');
       ctx.fontWeight = 'normal';
       ctx.textBaseline = 'middle';
       ctx.fontWeight = 'normal';
-      ctx.fillText(this.getTitle(), title_start + 5, top);
+      ctx.fillText(this.get('title'), title_start + 5, top);
     }
 
     var lastNode;
-    this.getChildren().forEach(function(child){
+    this.get('children').forEach(function(child){
       if (child instanceof Category && lastNode === 'node') {
         offset += 10;
       }
       child.renderInContext(ctx, height, offset);
-      offset += child.getWidth();
+      offset += child.get('width');
       lastNode = child instanceof Node ? 'node' : 'category';
     });
 
-    ctx.stroke();
   }
 };

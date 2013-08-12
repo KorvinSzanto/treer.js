@@ -14,11 +14,27 @@ function Node(title) {
     font_size: 16
   };
 
-  this.set = function(k, v) {
+  this.set = function(k, v, direct) {
+    if (direct !== true) {
+      var method = 'set' + k.split('_').map(function(val){
+        return val[0].toUpperCase() + val.substr(1)
+      }).join('');
+      if (this[method] && typeof this[method] === 'function') {
+        return this[method](v);
+      }
+    }
     me[k] = v;
     return this;
   }
-  this.get = function(k) {
+  this.get = function(k, direct) {
+    if (direct !== true) {
+      var method = 'get' + k.split('_').map(function(val){
+        return val[0].toUpperCase() + val.substr(1)
+      }).join('');
+      if (this[method] && typeof this[method] === 'function') {
+        return this[method]();
+      }
+    }
     return me[k];
   }
   this.with = function(k, handler) {
@@ -33,34 +49,28 @@ function Node(title) {
 
 Node.prototype = {
   init:function(title){
-    this.setTitle(title);
+    this.set('title', title);
     return this;
   },
   setTitle: function(title) {
-    this.set('title', title);
+    this.set('title', title, true);
     this.getWidth(1);
     return this;
   },
-  getTitle: function() {
-    return this.get('title');
-  },
   setColor: function(color) {
     if (!color) return this;
-    return this.set('color',color);
-  },
-  getColor: function() {
-    return this.get('color');
+    return this.set('color', color, true);
   },
   getWidth: function(reset) {
     var width = 10, element;
-    if (!reset && this.get('width') !== null) {
-      return this.get('width');
+    if (!reset && this.get('width', true) !== null) {
+      return this.get('width', true);
     }
     element = document.createElement('span');
     element.style.fontFamily = this.get('font_family');
     element.style.fontSize = this.get('font_size') + 'px';
     element.style.fontWeight = this.get('font_weight');
-    element.innerText = element.textContent = this.getTitle();
+    element.innerText = element.textContent = this.get('title');
     document.body.appendChild(element);
     width += element.offsetWidth;
     document.body.removeChild(element);
@@ -84,7 +94,7 @@ Node.prototype = {
     ctx.fontWeight = this.get('font_weight');
     ctx.textBaseline = 'bottom';
     ctx.textAlign = 'left';
-    ctx.fillStyle = this.getColor();
-    ctx.fillText(this.getTitle(), offset + 8, height);
+    ctx.fillStyle = this.get('color');
+    ctx.fillText(this.get('title'), offset + 8, height);
   }
 };
