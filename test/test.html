@@ -25,6 +25,37 @@
         <span>Helvetica</span>
     </div>
 </div>
+<br><br>
+<div id='nodemap2' data-title='Font Property' data-type='none'>
+    <span style='color:blue'>font:</span>
+    <div data-title='Optional' data-bracket-color='purple'>
+        <div data-title='Style' data-bracket-color='lightGreen'>
+            <span>&nbsp;italic&nbsp;</span>
+        </div>
+        <div data-title='variant'>
+            <span>small-caps</span>
+        </div>
+        <span>freetext</span>
+        <span>freetext</span>
+        <div data-title='Weight'>
+            <span style='font-weight:bold'>&nbsp;bolder&nbsp;</span>
+        </div>
+        <span>freetext</span>
+    </div>
+    <div data-title='Size' data-bracket-color='red'>
+        <span>&nbsp;18px / 15px&nbsp;</span>
+    </div>
+    <span>test</span>
+    <span>test</span>
+    <span>test</span>
+    <div data-title='Family'>
+        <span>Helvetica</span>
+    </div>
+</div>
+
 <script>
     document.getElementById('nodemap').treer();
+    document.getElementById('nodemap2').treer({
+        font_family: '"Comic Sans"'
+    });
 </script>

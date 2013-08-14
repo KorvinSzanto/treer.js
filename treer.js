@@ -1,11 +1,12 @@
 ;(function(){
   "use strict";
-function Category(config) {
+function Category(config, element) {
   if (!(this instanceof Category)) {
-    return new Category(config);
+    return new Category(config, element);
   }
 
   var me = {
+    config: {},
     title: null,
     width: null,
     depth: 1,
@@ -56,10 +57,8 @@ function Category(config) {
   this.with = function(k, handler) {
     return handler.call(this,k);
   }
-  if (config instanceof HTMLElement) {
-    return this.getFromElement(config);
-  }
-  return this.init(config);
+
+  return this.init(config, element);
 }
 // Enum
 Category.CategoryType = {
@@ -69,8 +68,22 @@ Category.CategoryType = {
 };
 
 Category.prototype = {
-  init:function(config) {
-    this.setTitle(config.title);
+  init:function(config, element) {
+    var key;
+    if (config instanceof HTMLElement) {
+      element = config;
+      config = {};
+    }
+
+    this.set('config', config);
+
+    for (key in config) {
+      this.set(key, config[key]);
+    }
+    if (element instanceof HTMLElement) {
+      this.getFromElement(element);
+    }
+    return this;
   },
   setColor: function(color) {
     if (!color) return this;
@@ -161,12 +174,12 @@ Category.prototype = {
       if (node.parentNode !== element) continue;
       child = null;
       if (node.nodeName === 'DIV') {
-        child = Category(node);
+        child = Category(this.get('config'), node);
         if (child.get('depth') >= this.get('depth')) {
           this.set('depth', child.get('depth') + 1);
         }
       } else if (node.nodeName === 'SPAN') {
-        child = Node(node);
+        child = Node(this.get('config'), node);
         child.setColor(node.style.color);
       }
       if (child) {
@@ -259,8 +272,8 @@ Category.prototype = {
 
   }
 };
-function Node(title) {
-  if (!(this instanceof Node)) return new Node(title);
+function Node(config, element) {
+  if (!(this instanceof Node)) return new Node(config, element);
   var me = {
     title: null,
     width: 0,
@@ -302,15 +315,25 @@ function Node(title) {
     return handler.call(this,k);
   }
 
-  if (title instanceof HTMLElement) {
-    return this.getFromElement(title);
-  }
-  return this.init(title);
+  return this.init(config, element);
 }
 
 Node.prototype = {
-  init:function(title){
-    this.set('title', title);
+  init:function(config, element) {
+    var key;
+    if (config instanceof HTMLElement) {
+      element = config;
+      config = {};
+    }
+
+    this.set('config', config);
+
+    for (key in config) {
+      this.set(key, config[key]);
+    }
+    if (element instanceof HTMLElement) {
+      this.getFromElement(element);
+    }
     return this;
   },
   setTitle: function(title) {
@@ -360,14 +383,14 @@ Node.prototype = {
   }
 };
 
-  HTMLElement.prototype.treer = function() {
-    var cat = Category(this);
+  HTMLElement.prototype.treer = function(config) {
+    var cat = Category(config, this);
     return cat.renderCanvas();
   };
   if (window.jQuery) {
-    window.jQuery.fn.treer = function(){
+    window.jQuery.fn.treer = function(config){
       this.each(function(){
-        this.treer();
+        this.treer(config);
       });
     }
   }

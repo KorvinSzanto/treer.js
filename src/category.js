@@ -1,9 +1,10 @@
-function Category(config) {
+function Category(config, element) {
   if (!(this instanceof Category)) {
-    return new Category(config);
+    return new Category(config, element);
   }
 
   var me = {
+    config: {},
     title: null,
     width: null,
     depth: 1,
@@ -54,10 +55,8 @@ function Category(config) {
   this.with = function(k, handler) {
     return handler.call(this,k);
   }
-  if (config instanceof HTMLElement) {
-    return this.getFromElement(config);
-  }
-  return this.init(config);
+
+  return this.init(config, element);
 }
 // Enum
 Category.CategoryType = {
@@ -67,8 +66,22 @@ Category.CategoryType = {
 };
 
 Category.prototype = {
-  init:function(config) {
-    this.setTitle(config.title);
+  init:function(config, element) {
+    var key;
+    if (config instanceof HTMLElement) {
+      element = config;
+      config = {};
+    }
+
+    this.set('config', config);
+
+    for (key in config) {
+      this.set(key, config[key]);
+    }
+    if (element instanceof HTMLElement) {
+      this.getFromElement(element);
+    }
+    return this;
   },
   setColor: function(color) {
     if (!color) return this;
@@ -159,12 +172,12 @@ Category.prototype = {
       if (node.parentNode !== element) continue;
       child = null;
       if (node.nodeName === 'DIV') {
-        child = Category(node);
+        child = Category(this.get('config'), node);
         if (child.get('depth') >= this.get('depth')) {
           this.set('depth', child.get('depth') + 1);
         }
       } else if (node.nodeName === 'SPAN') {
-        child = Node(node);
+        child = Node(this.get('config'), node);
         child.setColor(node.style.color);
       }
       if (child) {

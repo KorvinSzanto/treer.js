@@ -1,5 +1,5 @@
-function Node(title) {
-  if (!(this instanceof Node)) return new Node(title);
+function Node(config, element) {
+  if (!(this instanceof Node)) return new Node(config, element);
   var me = {
     title: null,
     width: 0,
@@ -41,15 +41,25 @@ function Node(title) {
     return handler.call(this,k);
   }
 
-  if (title instanceof HTMLElement) {
-    return this.getFromElement(title);
-  }
-  return this.init(title);
+  return this.init(config, element);
 }
 
 Node.prototype = {
-  init:function(title){
-    this.set('title', title);
+  init:function(config, element) {
+    var key;
+    if (config instanceof HTMLElement) {
+      element = config;
+      config = {};
+    }
+
+    this.set('config', config);
+
+    for (key in config) {
+      this.set(key, config[key]);
+    }
+    if (element instanceof HTMLElement) {
+      this.getFromElement(element);
+    }
     return this;
   },
   setTitle: function(title) {
